@@ -2,26 +2,40 @@
 	<body>
 		<script>
 			// Grab elements, create settings, etc.
-			var video = document.getElementById('video');
+			// var video = document.getElementById('video');
 
-			// Get access to the camera!
-			if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-			    // Not adding `{ audio: true }` since we only want video now
-			    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-			        video.src = window.URL.createObjectURL(stream);
-			        video.srcObject = stream;
-			        video.play();
-			    });
-			}
-			// Elements for taking the snapshot
-			var canvas = document.getElementById('canvas');
-			var context = canvas.getContext('2d');
-			var video = document.getElementById('video');
+			// Prefer camera resolution nearest to 1280x720.
+			var constraints = { audio: true, video: { width: 1280, height: 720 } }; 
 
-			// Trigger photo take
-			document.getElementById("snap").addEventListener("click", function() {
-				context.drawImage(video, 0, 0, 640, 480);
-			});
+			navigator.mediaDevices.getUserMedia(constraints)
+			.then(function(mediaStream) {
+			  var video = document.querySelector('video');
+			  video.srcObject = mediaStream;
+			  video.onloadedmetadata = function(e) {
+			    video.play();
+			  };
+			})
+			.catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+
+
+			// // Get access to the camera!
+			// if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+			//     // Not adding `{ audio: true }` since we only want video now
+			//     navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+			//         video.src = window.URL.createObjectURL(stream);
+			//         video.srcObject = stream;
+			//         video.play();
+			//     });
+			// }
+			// // Elements for taking the snapshot
+			// var canvas = document.getElementById('canvas');
+			// var context = canvas.getContext('2d');
+			// var video = document.getElementById('video');
+
+			// // Trigger photo take
+			// document.getElementById("snap").addEventListener("click", function() {
+			// 	context.drawImage(video, 0, 0, 640, 480);
+			// });
 		</script>
 		<p>Hello World!</p>
 		<video id="video" width="640" height="480" autoplay></video>
