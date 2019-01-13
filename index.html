@@ -1,45 +1,94 @@
 <html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="styles.css">
+	</head>
 	<body>
-		<script>
-			// Grab elements, create settings, etc.
-			// var video = document.getElementById('video');
-
-			// Prefer camera resolution nearest to 1280x720.
-			var constraints = { audio: true, video: { width: 1280, height: 720 } }; 
-
+		<video style="display: none;"id="inputVideo" width="1280" height="720" autoplay loop>
+ 		
+		</video>
+		<canvas id ="myCanvas"
+                width='1280' height='720' style = "border: 1px solid #000000; background-color: rgb(250,152,108);"> </canvas>
+		<script src="clmtrackr.js"></script>
+		<script type="text/javascript">
+			var score = 0;
+			var vy = 9;
+			var gravity = 0.005;
+			var video = document.getElementById('video');
+			var constraints = { video: { width: 1280, height: 720 } }; 
+			function getRandomInt(max) {
+  				return Math.floor(Math.random() * Math.floor(max));
+			}
 			navigator.mediaDevices.getUserMedia(constraints)
 			.then(function(mediaStream) {
 			  var video = document.querySelector('video');
+			//  console.log(video);
 			  video.srcObject = mediaStream;
 			  video.onloadedmetadata = function(e) {
 			    video.play();
 			  };
+			  var ctracker = new clm.tracker();
+			  ctracker.init();
+			  // console.log(video);
+			  ctracker.start(video);
+				var canvas = document.getElementById("myCanvas")
+       			var context = canvas.getContext("2d")  
+       			function Ball(position, offset) {
+				    this.radius = 50;
+				    this.x = (canvas.width * position) ;
+				    this.y = 0 - getRandomInt(offset);;
+				 
+				    this.draw = function(context) {
+				        context.fillStyle = 'black';
+				        context.beginPath();
+				        context.arc( this.x, this.y, this.radius, 0, Math.PI*2, false);
+				        context.closePath();
+				        context.fill();
+				    }
+				}
+				let ball = new Ball(0.5, 0);
+				function getNewBalls() {
+					let balls = [];
+	 				for(var k = 0; k < getRandomInt(4); k++) {
+						balls[k] = new Ball(Math.random(), getRandomInt(2000));
+	 				}
+	 				return balls
+				}
+        		let balls = getNewBalls();
+     
+			  function positionLoop() {
+			    requestAnimationFrame(positionLoop);
+			    var positions = ctracker.getCurrentPosition();
+			    context.clearRect(0, 0, canvas.width, canvas.height)
+			    context.beginPath()
+		            
+			   for(var i = 0; i < 14; i++) {
+			    	if(positions[i])  {
+			    		var center = canvas.width - positions[14][0] - canvas.width - positions[0][0];
+			    		var height = (positions[14][0] + positions[0][0]) / 2
+			    		context.moveTo(canvas.width - positions[i][0], positions[i][1] );
+			    		context.arc(canvas.width - positions[i][0], positions[i][1],10, 0, 2*Math.PI, true)
+			    		context.stroke()
+	        			
+            		}
+
+			   }
+			   //console.log('here before loop', balls, balls.length	)
+            	for (var j = balls.length - 1; j >= 0; j--) {
+            		balls[j].y += vy += gravity;
+            		// console.log(balls[j].y)
+            		balls[j].draw(context);
+            		if(balls[j].y + balls[j].radius > canvas.height) {
+            			balls[j] = new Ball(Math.random(), getRandomInt(1500));
+            		}
+            	}
+			    context.font = "30px Helvetica"
+        		context.strokeText(score,175,400)
+			  }
+			  positionLoop();
+			  
 			})
-			.catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
-
-
-			// // Get access to the camera!
-			// if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-			//     // Not adding `{ audio: true }` since we only want video now
-			//     navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-			//         video.src = window.URL.createObjectURL(stream);
-			//         video.srcObject = stream;
-			//         video.play();
-			//     });
-			// }
-			// // Elements for taking the snapshot
-			// var canvas = document.getElementById('canvas');
-			// var context = canvas.getContext('2d');
-			// var video = document.getElementById('video');
-
-			// // Trigger photo take
-			// document.getElementById("snap").addEventListener("click", function() {
-			// 	context.drawImage(video, 0, 0, 640, 480);
-			// });
+			.catch(function(err) { console.log(err.name + ": " + err.message); });
 		</script>
-		<p>Hello World!</p>
-		<video id="video" width="640" height="480" autoplay></video>
-	<button id="snap">Snap Photo</button>
-	<canvas id="canvas" width="640" height="480"></canvas>
+		
 	</body>
 </html>
