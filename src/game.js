@@ -6,7 +6,7 @@ const gravity = 0.001;
 
 var constraints = { video: { width: 1280, height: 720 } }; 
 function getRandomInt(max) { //random int-in-range generator from MDN
-		return Math.floor(Math.random() * Math.floor(max));
+	return Math.floor(Math.random() * Math.floor(max));
 }
 var basket = document.getElementById("basket");
 var basketball = document.getElementById("basketball");
@@ -35,30 +35,30 @@ navigator.mediaDevices.getUserMedia(constraints)
 	ctracker.init();
 	ctracker.start(video);
 	 
-		//ball function with position and offset to create different drops
+	//ball function with position and offset to create different drops
 	function Ball(position, offset) {
-			if(position > 0.75)  {
-				position = 0.75;
-			} else if(position < 0.25) {
-				position = 0.25;
-			}
-	    this.x = (canvas.width * position) ;
-	    this.y = 0 - getRandomInt(offset);;
-	    //this.degrees = 0;
-	    this.draw = function(context) {
-			context.drawImage(basketball, this.x - basketball.width, this.y - basketball.height);
-	    }
+		if(position > 0.75)  {
+			position = 0.75;
+		} else if(position < 0.25) {
+			position = 0.25;
+		}
+		this.x = (canvas.width * position) ;
+		this.y = 0 - getRandomInt(offset);;
+		//this.degrees = 0;
+		this.draw = function(context) {
+		    context.drawImage(basketball, this.x - basketball.width, this.y - basketball.height);
+		}
 	}
 	
 	//random list of balls on start up, anywhere from 2 to 6 at once
 	function getNewBalls() {
 		let balls = [];
-			for(var k = 0; k < 2 + getRandomInt(4); k++) {
+		for(var k = 0; k < 2 + getRandomInt(4); k++) {
 			balls[k] = new Ball(Math.random(), getRandomInt(1000));
-			}
-			return balls
+		}
+		return balls
 	}
-		let balls = getNewBalls();
+	let balls = getNewBalls();
 		
 	function positionLoop() {
 		requestAnimationFrame(positionLoop);
