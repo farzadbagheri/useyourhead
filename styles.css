@@ -8,3 +8,7 @@
 img {
 	display: none;
 }
+
+body {
+	cursor: none;
+}
